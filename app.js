@@ -13,13 +13,11 @@ var AlumniMemberRouter = require("./routes/AlumniMembers.router.js");
 var AdmissionRouter = require("./routes/Admission.route.js");
 const loginRoutes = require("./routes/loginRoutes");
 
-
-
 var app = express();
 dbConnection();
 
+// Enable CORS
 app.use(cors());
-
 app.use(
   cors({
     origin: ["http://localhost:5173"], 
@@ -28,32 +26,42 @@ app.use(
   })
 );
 
+// Set views directory and engine
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "jade");
 
+// Middleware
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
+// Routes
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/api/alumni-member", AlumniMemberRouter);
 app.use("/api/admission", AdmissionRouter);
 app.use("/api", loginRoutes);
 
+// Catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
 });
 
-// error handler
+// Error handler
 app.use(function (err, req, res, next) {
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
 
   res.status(err.status || 500);
   res.render("error");
+});
+
+// **PORT BINDING** (Fix for Render Deployment Issue)
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
 
 module.exports = app;
