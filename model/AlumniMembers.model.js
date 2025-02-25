@@ -14,6 +14,7 @@ const alumniMembersSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    Email: { type: String, required: true, unique: true },
     Date: {
       type: Date,
       required: true,
