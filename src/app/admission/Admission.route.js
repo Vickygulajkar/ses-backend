@@ -3,7 +3,7 @@ const {
   createAdmission,
   getAdmissions,
   updateAdmissionData,
-} = require("../controller/admission.controller");
+} = require("./admission.controller");
 
 const router = express.Router();
 

@@ -3,15 +3,9 @@ var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
-var { dbConnection } = require("./config/db.js");
+var { dbConnection } = require("./src/config/db.js");
 const cors = require("cors");
 require("dotenv").config();
-
-var indexRouter = require("./routes/index");
-var usersRouter = require("./routes/users");
-var AlumniMemberRouter = require("./routes/AlumniMembers.router.js");
-var AdmissionRouter = require("./routes/Admission.route.js");
-const loginRoutes = require("./routes/loginRoutes");
 
 var app = express();
 dbConnection();
@@ -38,13 +32,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 // Routes
-app.use("/", indexRouter);
-app.use("/users", usersRouter);
-app.use("/api/alumni-member", AlumniMemberRouter);
-app.use("/api/admission", AdmissionRouter);
-app.use("/api", loginRoutes);
+require("./src/config/routeRegistry.js")(app);
 
-// Catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
 });
@@ -53,7 +42,7 @@ app.use(function (req, res, next) {
 app.use(function (err, req, res, next) {
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
-
+ 
   res.status(err.status || 500);
   res.render("error");
 });

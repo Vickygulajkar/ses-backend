@@ -1,5 +1,5 @@
 const nodemailer = require("nodemailer");
-const AlumniMember = require("../model/AlumniMembers.model");
+const AlumniMember = require("./AlumniMembers.model");
 
 // Nodemailer Config
 const emailSender = nodemailer.createTransport({
@@ -179,7 +179,6 @@ exports.updateAlumniMemberStatus = async (req, res) => {
     alumni.Status = "Approved";
     await alumni.save();
     const { Email, StudentName } = alumni; 
-    console.log("alumni",alumni);
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: Email,
