@@ -12,7 +12,9 @@ const emailSender = nodemailer.createTransport({
 
 // Create Alumni Member
 exports.createAlumniMembers = async (req, res) => {
+
   try {
+    console.log('req.body', req.body);
     let { SchoolName, StudentName, Gender, Date, Address, Profession, Status, Email } = req.body;
 
     // Validation Check
@@ -176,6 +178,22 @@ exports.updateAlumniMemberStatus = async (req, res) => {
 
     alumni.Status = "Approved";
     await alumni.save();
+    const { Email, StudentName } = alumni; 
+    console.log("alumni",alumni);
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: Email,
+      subject: "Thank You For Registering",
+      text: `Hi ${StudentName}, your alumni membership has been successfully updated.`,
+    };
+
+    emailSender.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("❌ Error sending email:", error);
+      } else {
+        console.log("📧 Email sent:", info.response);
+      }
+    });
 
     return res.json({
       status: 1,
