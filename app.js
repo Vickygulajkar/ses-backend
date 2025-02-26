@@ -12,6 +12,7 @@ var usersRouter = require("./routes/users");
 var AlumniMemberRouter = require("./routes/AlumniMembers.router.js");
 var AdmissionRouter = require("./routes/Admission.route.js");
 const loginRoutes = require("./routes/loginRoutes");
+const UpcomingNewsRoutes = require("./routes/UpcomingNews.router.js");
 
 var app = express();
 dbConnection();
@@ -20,7 +21,7 @@ dbConnection();
 app.use(cors());
 app.use(
   cors({
-    origin: ["http://localhost:5173"], 
+    origin: ["http://localhost:5173"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
@@ -43,6 +44,7 @@ app.use("/users", usersRouter);
 app.use("/api/alumni-member", AlumniMemberRouter);
 app.use("/api/admission", AdmissionRouter);
 app.use("/api", loginRoutes);
+app.use("/api", UpcomingNewsRoutes);
 
 // Catch 404 and forward to error handler
 app.use(function (req, res, next) {
