@@ -18,7 +18,7 @@ exports.createAlumniMembers = async (req, res) => {
     let { SchoolName, StudentName, Gender, Date, Address, Profession, Status, Email } = req.body;
 
     // Validation Check
-    if (!SchoolName || !StudentName || !Gender || !Date || !Address || !Profession || !Status || !Email) {
+    if (!SchoolName || !StudentName || !Gender || !Date || !Address || !Profession || !Email) {
       return res.status(400).json({
         status: 0,
         message: "All fields are required",
@@ -34,7 +34,6 @@ exports.createAlumniMembers = async (req, res) => {
       });
     }
 
-    // Save in Database
     const alumniMember = new AlumniMember({
       SchoolName,
       StudentName,
@@ -42,20 +41,33 @@ exports.createAlumniMembers = async (req, res) => {
       Date,
       Address,
       Profession,
-      Status,
+      Status:'pending',
       Email,
     });
 
     await alumniMember.save();
 
-    // Send Confirmation Email
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: Email,
-      subject: "Thank You For Registering",
-      text: `Hi ${StudentName}, your alumni membership has been successfully recorded.`,
-    };
-
+      subject: "Acknowledgment of Your SES Alumni Application",
+      html: `
+      <div style="font-family: Arial, sans-serif; color: black;">
+          <p>Dear ${StudentName},</p>
+  
+          <p>Thank you for applying for the SES Alumni program. We have received your request and are currently processing it. 
+          <p/><p>We will get back to you as soon as possible with further information regarding the next steps.</p>
+  
+          <p>If you have any questions or need additional assistance in the meantime, please feel free to reach out.</p>
+  
+          <p>Thank you again for your interest, and we look forward to connecting with you soon!</p>
+  
+          <p>Best regards,</p>
+          <p><strong>SES Alumni Team</strong></p>
+      </div>
+      `,
+  };
+  
     emailSender.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.error("❌ Error sending email:", error);
@@ -79,7 +91,6 @@ exports.createAlumniMembers = async (req, res) => {
     });
   }
 };
-
 
 // exports.createAlumniMembers = async (req, res) => {
 //   let { SchoolName, StudentName, Gender, Date, Address, Profession , Status, email} = req.body;
@@ -147,44 +158,59 @@ exports.getAlumniMembers = async (req, res) => {
   }
 };
 
-
 exports.updateAlumniMemberStatus = async (req, res) => {
   const { id } = req.params;
   const { Status } = req.body;
 
+  // Validate request
   if (!Status || Status !== "Approved") {
-    return res.json({
+    return res.status(400).json({
       status: 0,
       message: "Status can only be updated to 'Approved'",
     });
   }
 
   try {
-    const alumni = await AlumniMember.findById(id);
+    const alumni = await AlumniMember.findOne({ _id: id, Status: "pending" });
 
     if (!alumni) {
-      return res.json({
+      return res.status(404).json({
         status: 0,
-        message: "Alumni member not found",
+        message: "Alumni member not found or status is not 'pending'",
       });
     }
 
-    if (alumni.Status !== "pending") {
-      return res.json({
+    const updatedAlumni = await AlumniMember.findByIdAndUpdate(
+      id,
+      { Status: "Approved" },
+      { new: true }
+    );
+
+    if (!updatedAlumni) {
+      return res.status(500).json({
         status: 0,
-        message: "Only 'Pending' status can be updated to 'Approved'",
+        message: "Failed to update status",
       });
     }
 
-    alumni.Status = "Approved";
-    await alumni.save();
-    const { Email, StudentName } = alumni; 
-    console.log("alumni",alumni);
+    const { Email, StudentName } = updatedAlumni;
+
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: Email,
-      subject: "Thank You For Registering",
-      text: `Hi ${StudentName}, your alumni membership has been successfully updated.`,
+      subject: "Approval of Your SES Alumni Application",
+      html: `
+        <div style="font-family: Arial, sans-serif; color: black;">
+          <p>Dear ${StudentName},</p>
+          <p>We are pleased to inform you that your application for the <strong>SES Alumni</strong> program has been approved! Congratulations and welcome to the SES Alumni community.</p>
+          <p>We are excited to have you join us and look forward to the valuable contributions you will make to our network.</p>
+          <p>In the coming days, we will provide you with additional details about the program and the next steps to get started.</p>
+          <p>If you have any questions or need assistance, please don't hesitate to reach out. We're here to support you every step of the way.</p>
+          <p>Once again, congratulations, and we look forward to connecting with you soon!</p>
+          <p>Best regards,</p>
+          <p><strong>SES Alumni Team</strong></p>
+        </div>
+      `,
     };
 
     emailSender.sendMail(mailOptions, (error, info) => {
@@ -195,13 +221,15 @@ exports.updateAlumniMemberStatus = async (req, res) => {
       }
     });
 
-    return res.json({
+    return res.status(200).json({
       status: 1,
       message: "Alumni member status updated to 'Approved'",
-      data: alumni,
+      data: updatedAlumni,
     });
+
   } catch (error) {
-    return res.json({
+    console.error("❌ Error:", error);
+    return res.status(500).json({
       status: 0,
       message: "Something went wrong",
       error: error.message,
