@@ -1,5 +1,5 @@
 const express = require('express');
-const { createAlumniMembers, getAlumniMembers, updateAlumniMemberStatus } = require('../controller/alumniMembers.controller');
+const { createAlumniMembers, getAlumniMembers, updateAlumniMemberStatus } = require('./alumniMembers.controller');
 const router = express.Router()
 
 router.post('/create', createAlumniMembers)
