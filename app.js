@@ -7,13 +7,6 @@ var { dbConnection } = require("./config/db.js");
 const cors = require("cors");
 require("dotenv").config();
 
-var indexRouter = require("./routes/index");
-var usersRouter = require("./routes/users");
-var AlumniMemberRouter = require("./routes/AlumniMembers.router.js");
-var AdmissionRouter = require("./routes/Admission.route.js");
-const loginRoutes = require("./routes/loginRoutes");
-const UpcomingNewsRoutes = require("./routes/UpcomingNews.router.js");
-
 var app = express();
 dbConnection();
 
@@ -39,14 +32,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 // Routes
-app.use("/", indexRouter);
-app.use("/users", usersRouter);
-app.use("/api/alumni-member", AlumniMemberRouter);
-app.use("/api/admission", AdmissionRouter);
-app.use("/api", loginRoutes);
-app.use("/api", UpcomingNewsRoutes);
+require("./src/config/routeRegistry.js")(app);
 
-// Catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
 });
