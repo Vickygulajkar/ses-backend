@@ -1,4 +1,4 @@
-const admissions = require("./Admission.model");
+const admissions = require("../model/Admission.model");
 // const nodemailer = require("nodemailer");
 
 // // Create a nodemailer transporter

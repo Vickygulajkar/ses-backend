@@ -264,6 +264,7 @@ exports.getAlumniMembers = async (req, res) => {
 
 
 exports.updateAlumniMemberStatus = async (req, res) => {
+  console.log("req",req.body);
   const { id } = req.params;
   const { Status } = req.body;
 
@@ -366,7 +367,7 @@ async function generateAlumniCertificate(studentName, registrationRandomNumber, 
   </head>
   <body>
       <div class="certificate-text">
-          <p>This certifies that <strong>Mr. ${studentName}</strong> is now an esteemed member of the</p>
+          <p> <strong>Mr. ${studentName}</strong><br/> is now an esteemed member of the</p>
           <p><strong>Sindhu Education Society Alumni Network</strong>, Jaripatka, Nagpur—a legacy of excellence since 1952.</p>
           <p>Registered under <strong>${registrationRandomNumber}</strong>.</p>
       </div>
