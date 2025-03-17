@@ -10,16 +10,20 @@ const alumniMembersSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    Gender: {
+    salutation: {
       type: String,
       required: true,
     },
     Email: { type: String, required: true, unique: true },
+    contact: { type: String, required: true },
+    eduYear: { type: String, required: true },
+    classOrDegree: { type: String, required: true },
+    registrationNumber: { type: String, required: false },
     Date: {
       type: Date,
       required: true,
     },
-    Address: {
+    description: {
       type: String,
       required: true,
     },
